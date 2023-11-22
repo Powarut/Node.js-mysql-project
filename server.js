@@ -22,11 +22,11 @@ app.use(express.urlencoded({extended: true}))
 
 //mariadb://mark:C-sZ0RMSY@q8RLQB@console.aws.relist.dev:3366
 const conn = mysql2.createConnection({
-  port : '3306',
-  host: '127.0.0.1',
-  user: 'root',
-  password: '',
-  database:'project'
+  port : process.env.DB_PORT,
+  host: process.env.DB_URL,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
 //API read all Members
