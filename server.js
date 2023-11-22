@@ -20,13 +20,13 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-
+//mariadb://mark:C-sZ0RMSY@q8RLQB@console.aws.relist.dev:3366
 const conn = mysql2.createConnection({
-  port : '3306',
-  host: '127.0.0.1',
-  user: 'root',
-  password: '',
-  database:'project'
+  port : '3366',
+  host: 'console.aws.relist.dev',
+  user: 'mark',
+  password: 'C-sZ0RMSY@q8RLQB',
+  database:'mark_project'
 });
 
 //API read all Members
@@ -391,8 +391,8 @@ app.delete('/food/:food_id',cors(), async (req, res) => {
   })
 })
 
-// API edit food
-app.put('/food/food_name', async (req, res) => {
+// API change ststus_food
+app.put('/food/food_id', async (req, res) => {
   console.log(req.body)
   const { food_id, status } = req.body
 
