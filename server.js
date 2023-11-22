@@ -20,7 +20,7 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-//mariadb://mark:C-sZ0RMSY@q8RLQB@console.aws.relist.dev:3366
+
 const conn = mysql2.createConnection({
   port : process.env.DB_PORT,
   host: process.env.DB_URL,
