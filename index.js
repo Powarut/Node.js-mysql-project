@@ -29,6 +29,10 @@ const conn = mysql2.createConnection({
   database: "mark_project"
 });
 
+
+app.get('/', (req, res) => {
+  res.send('ok')
+})
 //API read all Members
 app.get('/members',cors(),async (req, res) => {
   let sql = "SELECT * FROM members"
