@@ -22,7 +22,7 @@ app.use(express.urlencoded({extended: true}))
 
 //process.env.DB_
 const conn = mysql2.createConnection({
-  port : process.env.DB_PORT,
+  port : "3366",
   host: "console.aws.relist.dev",
   user: "mark",
   password: "C-sZ0RMSY@q8RLQB",
