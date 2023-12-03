@@ -20,15 +20,19 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-//mariadb://mark:C-sZ0RMSY@q8RLQB@console.aws.relist.dev:3366
+//process.env.DB_
 const conn = mysql2.createConnection({
-  port : process.env.DB_PORT,
-  host: process.env.DB_URL,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+  port : "3366",
+  host: "console.aws.relist.dev",
+  user: "mark",
+  password: "C-sZ0RMSY@q8RLQB",
+  database: "mark_project"
 });
 
+
+app.get('/', (req, res) => {
+  res.send('ok')
+})
 //API read all Members
 app.get('/members',cors(),async (req, res) => {
   let sql = "SELECT * FROM members"
