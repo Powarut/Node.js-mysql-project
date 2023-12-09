@@ -359,7 +359,7 @@ app.post('/food',cors(),upload.single('food_image'), (req, res) => {
 // read food
 app.get('/food',cors(),async (req, res) => {
   let sql = "SELECT * FROM food"
-  console.log(305)
+  console.log('เรียกข้อมูลสำเร็จ')
   await conn.execute(sql,(err,result) => {
     if(err) {
       res.status(500).json({
