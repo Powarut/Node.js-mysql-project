@@ -5,6 +5,8 @@ const mysql2 = require('mysql2')
 const bcrypt = require('bcrypt')
 const multer = require('multer')
 const {upload} = require('./maddlewave')
+const {conn} = require("./database/connection")
+const { order } = require("./order/orderToMerchandise")
 
 
 var cors = require('cors')
@@ -20,15 +22,7 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-//process.env.DB_
-const conn = mysql2.createConnection({
-  port : "3366",
-  host: "console.aws.relist.dev",
-  user: "mark",
-  password: "C-sZ0RMSY@q8RLQB",
-  database: "mark_project"
-});
-
+app.use(order)
 
 app.get('/', (req, res) => {
   res.send('ok')
