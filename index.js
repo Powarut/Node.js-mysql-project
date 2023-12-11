@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const port = 3000
 const mysql2 = require('mysql2')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const multer = require('multer')
 const {upload} = require('./maddlewave')
 const {conn} = require("./database/connection")
@@ -26,23 +26,6 @@ app.use(order)
 
 app.get('/', (req, res) => {
   res.send('ok')
-})
-//API read all Members
-app.get('/members',cors(),async (req, res) => {
-  let sql = "SELECT * FROM members"
-
-  await conn.execute(sql,(err,result) => {
-    if(err) {
-      res.status(500).json({
-        message : err.message
-      })
-      return
-    }
-    res.status(200).json({
-      message : "เรียกข้อมูลสำเร็จ",
-      data : result
-    })
-  })
 })
 
 //API insert member
@@ -119,25 +102,6 @@ app.put('/members/:mem_id',cors(), async (req, res) => {
   })
 })
 
-//API delete member
-app.delete('/members/:mem_id',cors(), async (req, res) => {
-  const { mem_id } = req.params
-  let sql = "DELETE FROM members WHERE mem_id = ?"
-  conn.execute(sql,
-    [mem_id],
-    (err, result) => {
-      if(err){
-        res.status(500).json({
-          message : err.message
-        })
-        return
-      }
-      res.status(200).json({
-        message : "ลบข้อมูลสำเร็จ",
-        data : result
-    })
-  })
-})
 // END Members------------------------------------------------------------------------------------
 
 // API Login member
@@ -305,24 +269,6 @@ app.put('/riders/:rider_id',cors(), async (req, res) => {
   })
 })
 
-// API delete rider
-app.delete('/riders/:rider_id',cors(), async (req, res) => {
-  const { rider_id } = req.params
-  let sql = "DELETE FROM riders WHERE rider_id = ?"
-  conn.execute(sql,
-    [rider_id],
-    (err, result) => {
-      if(err){
-        res.status(500).json({
-          message : err.message
-        })
-        return
-      }
-      res.status(200).json({
-        message : "ลบข้อมูลสำเร็จ"
-    })
-  })
-})
 // END Riders -----------------------------------------------------------------------------------------------------
 
 // API  upload image+food

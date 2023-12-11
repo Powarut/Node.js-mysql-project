@@ -1,6 +1,5 @@
 const express = require('express')
 const order = express()
-const bcrypt = require('bcrypt')
 const multer = require('multer')
 const { upload } = require('../maddlewave')
 const { conn } = require("../database/connection")
