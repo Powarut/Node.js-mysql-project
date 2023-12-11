@@ -34,13 +34,14 @@ async function postOrderMember(req, res) {
         await conn.execute(
             sql,
             [
-                order[0].mem_id,
+                order.products[0].mem_id,
                 null,
                 JSON.stringify(order),
-                0
+                order.status
             ],
             (err, result) => {
                 if(err) {
+                  conn.rollback()
                   res.status(500).json({
                     message : err.message, 
                     statusCode : 500
@@ -57,7 +58,40 @@ async function postOrderMember(req, res) {
     }
 }
 
+async function getOrderMember(req, res) {
+  if (req.body) {
+    const order = req.body;
+    console.log("================================")
+    console.log(order);
+
+    const sql = `
+    SELECT * FROM member_orders 
+    JOIN members
+    ON members.mem_id = member_orders.order_mem_id
+    WHERE order_mem_id = ? and status = ?`;
+
+    await conn.execute(
+      sql,
+      [order.mem_id, order.status],
+      (err, result) => {
+        if (err) {
+          conn.rollback()
+          res.status(500).json({
+            message: err.message,
+            statusCode: 500,
+          });
+        }
+        res.status(201).json({
+          statusCode: 200,
+          message: "เรียกข้อมูลสำเร็จ",
+          data: result,
+        });
+      }
+    );
+  }
+}
 
 order.post("/orderMember", postOrderMember);
+order.post("/getOrderMember", getOrderMember);
 
-module.exports = { order }
+module.exports = { order };
