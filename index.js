@@ -119,7 +119,7 @@ await conn.execute(sql, [mem_email,], (err, result) => {
     console.log(141,result)
     //ตรวจสอบค่าว่า result ต้องมี length
     if(!result.length) {
-      res.status(500).json({
+      res.status(401).json({
         message : '',
         status: 'fail'
       })
@@ -136,7 +136,25 @@ await conn.execute(sql, [mem_email,], (err, result) => {
         status : 'success'
       })
     }
-    
+    // try{
+    //   const { rider_email, rider_password } = req.body
+    // const passwordHash = await bcrypt.hash(rider_password, 10)
+    // const riderData = {
+    //   rider_email,
+    //   rider_password: passwordHash
+    // }
+    // const [results] = await conn.query('INSERT INTO rider SET ?',riderData)
+    // res.json({
+    //   message: 'เพิ่มข้อมูลเรียบร้อย',
+    //   results
+    // }) 
+    // }catch (error){
+    //   console.log('error', error)
+    //   res.json({
+    //     message: 'เพิ่มข้อมูลล้มเหลว',
+    //     error
+    //   })
+    // }
   })
 })
 // end api login -----------------------------------------------------------------------------------------
@@ -173,7 +191,6 @@ await conn.execute(sql, [rider_email,], (err, result) => {
         status : 'success'
       })
     }
-    
   })
 })
 // end api login -----------------------------------------------------------------------------------------
