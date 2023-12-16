@@ -122,25 +122,6 @@ app.put('/members/:mem_id',cors(), async (req, res) => {
   })
 })
 
-//API delete member
-app.delete('/members/:mem_id',cors(), async (req, res) => {
-  const { mem_id } = req.params
-  let sql = "DELETE FROM members WHERE mem_id = ?"
-  conn.execute(sql,
-    [mem_id],
-    (err, result) => {
-      if(err){
-        res.status(500).json({
-          message : err.message
-        })
-        return
-      }
-      res.status(200).json({
-        message : "ลบข้อมูลสำเร็จ",
-        data : result
-    })
-  })
-})
 // END Members------------------------------------------------------------------------------------
 
 // API Login member
@@ -158,7 +139,7 @@ await conn.execute(sql, [mem_email,], (err, result) => {
     console.log(141,result)
     //ตรวจสอบค่าว่า result ต้องมี length
     if(!result.length) {
-      res.status(500).json({
+      res.status(401).json({
         message : '',
         status: 'fail'
       })
@@ -175,7 +156,25 @@ await conn.execute(sql, [mem_email,], (err, result) => {
         status : 'success'
       })
     }
-    
+    // try{
+    //   const { rider_email, rider_password } = req.body
+    // const passwordHash = await bcrypt.hash(rider_password, 10)
+    // const riderData = {
+    //   rider_email,
+    //   rider_password: passwordHash
+    // }
+    // const [results] = await conn.query('INSERT INTO rider SET ?',riderData)
+    // res.json({
+    //   message: 'เพิ่มข้อมูลเรียบร้อย',
+    //   results
+    // }) 
+    // }catch (error){
+    //   console.log('error', error)
+    //   res.json({
+    //     message: 'เพิ่มข้อมูลล้มเหลว',
+    //     error
+    //   })
+    // }
   })
 })
 // end api login -----------------------------------------------------------------------------------------
@@ -212,7 +211,6 @@ await conn.execute(sql, [rider_email,], (err, result) => {
         status : 'success'
       })
     }
-    
   })
 })
 // end api login -----------------------------------------------------------------------------------------
@@ -308,24 +306,6 @@ app.put('/riders/:rider_id',cors(), async (req, res) => {
   })
 })
 
-// API delete rider
-app.delete('/riders/:rider_id',cors(), async (req, res) => {
-  const { rider_id } = req.params
-  let sql = "DELETE FROM riders WHERE rider_id = ?"
-  conn.execute(sql,
-    [rider_id],
-    (err, result) => {
-      if(err){
-        res.status(500).json({
-          message : err.message
-        })
-        return
-      }
-      res.status(200).json({
-        message : "ลบข้อมูลสำเร็จ"
-    })
-  })
-})
 // END Riders -----------------------------------------------------------------------------------------------------
 
 // API  upload image+food
