@@ -556,8 +556,7 @@ app.post("/orderMember", async (req, res) => {
   }
 })
 
-
-order.post("/getOrderMember", async (req, res) => {
+app.post("/getOrderMember", async (req, res) => {
   if (req.body) {
       const order = req.body
       console.log(order)
