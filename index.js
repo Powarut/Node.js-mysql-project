@@ -1,18 +1,20 @@
 const express = require('express')
-const app = express()
-const port = 3000
-const mysql2 = require('mysql2')
 const bcrypt = require('bcrypt')
 const multer = require('multer')
+const socketIO = require("socket.io")
+const http = require("http")
 const {upload} = require('./maddlewave')
 const {conn} = require("./database/connection")
 const { order } = require("./order/orderToMerchandise")
 
 
+const port = 3000
+const app = express()
+const saltRound = 10
 var cors = require('cors')
+
 app.use('/food_images', express.static('./images'))
 app.use('/rider_images', express.static('./images'))
-const saltRound = 10
 app.use(
   cors({
       origin: '*',
@@ -27,6 +29,7 @@ app.use(order)
 app.get('/', (req, res) => {
   res.send('ok')
 })
+
 //API read all Members
 app.get('/members',cors(),async (req, res) => {
   let sql = "SELECT * FROM members"
