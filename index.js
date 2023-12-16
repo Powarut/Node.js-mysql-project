@@ -1,12 +1,8 @@
 const express = require('express')
+const mysql2 = require('mysql2')
 const bcrypt = require('bcrypt')
 const multer = require('multer')
-const socketIO = require("socket.io")
-const http = require("http")
 const {upload} = require('./maddlewave')
-const {conn} = require("./database/connection")
-const { order } = require("./order/orderToMerchandise")
-
 
 const port = 3000
 const app = express()
@@ -24,7 +20,13 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.use(order)
+const conn = mysql2.createConnection({
+  port : "3366",
+  host: "console.aws.relist.dev",
+  user: "mark",
+  password: "C-sZ0RMSY@q8RLQB",
+  database: "mark_project"
+});
 
 app.get('/', (req, res) => {
   res.send('ok')
@@ -520,6 +522,79 @@ app.put("/editcart", (req, res) => {
     }
 })
 //END
+
+
+app.post("/orderMember", async (req, res) => {
+  if (req.body) {
+    const order = req.body;
+
+    const sql = `
+    SELECT * FROM member_orders 
+    JOIN members
+    ON members.mem_id = member_orders.order_mem_id
+    WHERE order_mem_id = ? and status = ?`;
+
+    const query = await conn.execute(
+      sql,
+      [order.mem_id, order.status],
+      (err, result) => {
+        if (err) {
+          conn.rollback()
+          res.status(500).json({
+            message: err.message,
+            statusCode: 500,
+          });
+          return
+        }
+        res.status(201).json({
+          statusCode: 200,
+          message: "เรียกข้อมูลสำเร็จ",
+          data: result,
+        });
+      }
+    );
+  }
+})
+
+
+order.post("/getOrderMember", async (req, res) => {
+  if (req.body) {
+      const order = req.body
+      console.log(order)
+      const sql = `INSERT INTO member_orders (
+          order_mem_id,
+          order_id,
+          mem_order_data,
+          status
+      ) VALUES (
+          ?, ?, ?, ?
+      )`
+      await conn.execute(
+          sql,
+          [
+              order.products[0].mem_id,
+              null,
+              JSON.stringify(order),
+              order.status
+          ],
+          (err, result) => {
+              if(err) {
+                conn.rollback()
+                res.status(500).json({
+                  message : err.message, 
+                  statusCode : 500
+                })
+                return
+              }
+              res.status(201).json({
+                message : "เพิ่มข้อมูลสำเร็จ",
+                data : result, 
+                statusCode: 200
+              })
+          }
+      )
+  }
+});
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`)
 })
