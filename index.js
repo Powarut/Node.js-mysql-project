@@ -52,16 +52,15 @@ app.get('/members',cors(),async (req, res) => {
 
 //API insert member
 app.post('/members',cors(),async (req, res) => {
-  console.log(40)
-  const { mem_email, mem_password, mem_name, mem_surname, mem_phone } = req.body
-  console.log(42, req.body)
+  const { mem_email, mem_password, mem_name, mem_surname, mem_phone, mem_address } = req.body
   bcrypt.genSalt(saltRound, (err, salt) => {
     bcrypt.hash(mem_password, salt, (err, hash) => {
-      let sql = "INSERT INTO members (mem_email, mem_password, mem_name, mem_surname, mem_phone) VALUES (?, ?, ?, ?, ?)";
+      let sql = "INSERT INTO members (mem_email, mem_password, mem_name, mem_surname, mem_phone, mem_address) VALUES (?, ?, ?, ?, ?, ?)";
       conn.execute(sql, 
-        [mem_email,hash, mem_name, mem_surname, mem_phone],
+        [mem_email,hash, mem_name, mem_surname, mem_phone, mem_address],
          (err, result) => {
             if(err) {
+              conn.rollback
               res.status(500).json({
                 message : err.message, 
                 statusCode : 500
@@ -533,7 +532,7 @@ app.post("/getOrderMember", (req, res) => {
     JOIN members
     ON members.mem_id = member_orders.order_mem_id
     WHERE order_mem_id = ? and status = ?`;
-    console.log(order)
+   
     conn.execute(
       sql,
       [order.mem_id, order.status],
@@ -559,7 +558,6 @@ app.post("/getOrderMember", (req, res) => {
 app.post("/saveOrderMember", (req, res) => {
   if (req.body) {
       const order = req.body
-      console.log(order)
       const sql = `INSERT INTO member_orders (
           order_mem_id,
           order_id,
