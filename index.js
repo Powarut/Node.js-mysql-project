@@ -524,7 +524,7 @@ app.put("/editcart", (req, res) => {
 //END
 
 
-app.post("/orderMember", async (req, res) => {
+app.post("/getOrderMember", (req, res) => {
   if (req.body) {
     const order = req.body;
 
@@ -533,8 +533,8 @@ app.post("/orderMember", async (req, res) => {
     JOIN members
     ON members.mem_id = member_orders.order_mem_id
     WHERE order_mem_id = ? and status = ?`;
-
-    const query = await conn.execute(
+    console.log(order)
+    conn.execute(
       sql,
       [order.mem_id, order.status],
       (err, result) => {
@@ -556,7 +556,7 @@ app.post("/orderMember", async (req, res) => {
   }
 })
 
-app.post("/getOrderMember", async (req, res) => {
+app.post("/saveOrderMember", (req, res) => {
   if (req.body) {
       const order = req.body
       console.log(order)
@@ -568,7 +568,7 @@ app.post("/getOrderMember", async (req, res) => {
       ) VALUES (
           ?, ?, ?, ?
       )`
-      await conn.execute(
+      conn.execute(
           sql,
           [
               order.products[0].mem_id,
