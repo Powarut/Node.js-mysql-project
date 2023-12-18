@@ -1,7 +1,6 @@
 const express = require('express')
 const mysql2 = require('mysql2')
 const bcrypt = require('bcrypt')
-const multer = require('multer')
 const {upload} = require('./maddlewave')
 
 const port = 3000
@@ -26,6 +25,15 @@ const conn = mysql2.createConnection({
   user: "mark",
   password: "C-sZ0RMSY@q8RLQB",
   database: "mark_project"
+});
+
+//instantiate the connection
+conn.connect(function (err) {
+  if (err) {
+      console.log(`connectionrequest failed ${err.stack}`)
+  } else {
+      console.log(`db connectionrequest successful ${conn.threadId}`)
+  }
 });
 
 app.get('/', (req, res) => {
@@ -338,7 +346,7 @@ app.post('/food',cors(),upload.single('food_image'), (req, res) => {
 app.get('/food',cors(),async (req, res) => {
   let sql = "SELECT * FROM food"
   console.log('เรียกข้อมูลสำเร็จ')
-  await conn.execute(sql,(err,result) => {
+  await conn.execute(sql,[], (err,result) => {
     if(err) {
       res.status(500).json({
         message : err.message
@@ -523,7 +531,7 @@ app.put("/editcart", (req, res) => {
 //END
 
 
-app.post("/getOrderMember", (req, res) => {
+app.post("/getOrderMember", async (req, res) => {
   if (req.body) {
     const order = req.body;
 
@@ -532,8 +540,7 @@ app.post("/getOrderMember", (req, res) => {
     JOIN members
     ON members.mem_id = member_orders.order_mem_id
     WHERE order_mem_id = ? and status = ?`;
-   
-    conn.execute(
+    await conn.execute(
       sql,
       [order.mem_id, order.status],
       (err, result) => {
@@ -574,7 +581,7 @@ app.post("/saveOrderMember", (req, res) => {
               JSON.stringify(order),
               order.status
           ],
-          (err, result) => {
+          function (err, result, fields) {
               if(err) {
                 conn.rollback()
                 res.status(500).json({
@@ -583,6 +590,7 @@ app.post("/saveOrderMember", (req, res) => {
                 })
                 return
               }
+              console.log(result)
               res.status(201).json({
                 message : "เพิ่มข้อมูลสำเร็จ",
                 data : result, 
@@ -590,6 +598,7 @@ app.post("/saveOrderMember", (req, res) => {
               })
           }
       )
+      
   }
 });
 app.listen(port, () => {
