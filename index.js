@@ -1,18 +1,16 @@
 const express = require('express')
-const app = express()
-const port = 3000
 const mysql2 = require('mysql2')
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 const multer = require('multer')
 const {upload} = require('./maddlewave')
-const {conn} = require("./database/connection")
-const { order } = require("./order/orderToMerchandise")
 
-
+const port = 3000
+const app = express()
+const saltRound = 10
 var cors = require('cors')
+
 app.use('/food_images', express.static('./images'))
 app.use('/rider_images', express.static('./images'))
-const saltRound = 10
 app.use(
   cors({
       origin: '*',
@@ -22,24 +20,47 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.use(order)
+const conn = mysql2.createConnection({
+  port : "3366",
+  host: "console.aws.relist.dev",
+  user: "mark",
+  password: "C-sZ0RMSY@q8RLQB",
+  database: "mark_project"
+});
 
 app.get('/', (req, res) => {
   res.send('ok')
 })
 
+//API read all Members
+app.get('/members',cors(),async (req, res) => {
+  let sql = "SELECT * FROM members"
+
+  await conn.execute(sql,(err,result) => {
+    if(err) {
+      res.status(500).json({
+        message : err.message
+      })
+      return
+    }
+    res.status(200).json({
+      message : "เรียกข้อมูลสำเร็จ",
+      data : result
+    })
+  })
+})
+
 //API insert member
 app.post('/members',cors(),async (req, res) => {
-  console.log(40)
-  const { mem_email, mem_password, mem_name, mem_surname, mem_phone } = req.body
-  console.log(42, req.body)
+  const { mem_email, mem_password, mem_name, mem_surname, mem_phone, mem_address } = req.body
   bcrypt.genSalt(saltRound, (err, salt) => {
     bcrypt.hash(mem_password, salt, (err, hash) => {
-      let sql = "INSERT INTO members (mem_email, mem_password, mem_name, mem_surname, mem_phone) VALUES (?, ?, ?, ?, ?)";
+      let sql = "INSERT INTO members (mem_email, mem_password, mem_name, mem_surname, mem_phone, mem_address) VALUES (?, ?, ?, ?, ?, ?)";
       conn.execute(sql, 
-        [mem_email,hash, mem_name, mem_surname, mem_phone],
+        [mem_email,hash, mem_name, mem_surname, mem_phone, mem_address],
          (err, result) => {
             if(err) {
+              conn.rollback
               res.status(500).json({
                 message : err.message, 
                 statusCode : 500
@@ -439,6 +460,145 @@ app.post('/foodtest',cors(), (req, res) => {
 // end API food --------
 
 
+<<<<<<< HEAD
+=======
+// get menu in cart
+app.get("/menuInCart", (req, res) => {
+  const {
+    mem_id,
+    status
+  } = req.body
+  const sql = "SELECT * FROM cart WHERE mem_id = ? AND status = ?"
+  conn.execute(
+    sql,
+    [
+      mem_id,
+      status
+    ],
+    (err, result) => {
+      if (err) {
+        res.status(500).json({
+          message: err.message,
+        });
+        return;
+      }
+      res.status(201).json({
+        message: "เมนูในตะกร้า",
+        data: result,
+      });
+    }
+  )
+})//END
+
+// API edit quantity in cart
+app.put("/editcart", (req, res) => {
+    const {
+      quantity,
+      mem_id,
+      food_id,
+      cart_id,
+      status
+    } =  req.body
+ 
+    if (status === 0) {
+      const sql = "UPDATE cart SET quantity = ? WHERE mem_id = ? AND food_id = ? AND cart_id AND status = ?"
+      conn.execute(
+        sql,
+        [
+          quantity,
+          mem_id,
+          food_id,
+          cart_id,
+          status
+        ],
+        (err, result) => {
+          if (err) {
+            res.status(500).json({
+              message: err.message,
+            });
+            return;
+          }
+          res.status(201).json({
+            message: "เปลี่ยนแปลงจำนวนแล้ว",
+            data: result,
+          });
+        }
+      )
+    }
+})
+//END
+
+
+app.post("/getOrderMember", (req, res) => {
+  if (req.body) {
+    const order = req.body;
+
+    const sql = `
+    SELECT * FROM member_orders 
+    JOIN members
+    ON members.mem_id = member_orders.order_mem_id
+    WHERE order_mem_id = ? and status = ?`;
+   
+    conn.execute(
+      sql,
+      [order.mem_id, order.status],
+      (err, result) => {
+        if (err) {
+          conn.rollback()
+          res.status(500).json({
+            message: err.message,
+            statusCode: 500,
+          });
+          return
+        }
+        res.status(201).json({
+          statusCode: 200,
+          message: "เรียกข้อมูลสำเร็จ",
+          data: result,
+        });
+      }
+    );
+  }
+})
+
+app.post("/saveOrderMember", (req, res) => {
+  if (req.body) {
+      const order = req.body
+      const sql = `INSERT INTO member_orders (
+          order_mem_id,
+          order_id,
+          mem_order_data,
+          status
+      ) VALUES (
+          ?, ?, ?, ?
+      )`
+      conn.execute(
+          sql,
+          [
+              order.products[0].mem_id,
+              null,
+              JSON.stringify(order),
+              order.status
+          ],
+          (err, result) => {
+              if(err) {
+                conn.rollback()
+                res.status(500).json({
+                  message : err.message, 
+                  statusCode : 500
+                })
+                return
+              }
+              res.status(201).json({
+                message : "เพิ่มข้อมูลสำเร็จ",
+                data : result, 
+                statusCode: 200
+              })
+          }
+      )
+  }
+});
+>>>>>>> ec5243839ce2a408ecc269a29c3b4d096f0206bf
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`)
 })

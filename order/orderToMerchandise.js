@@ -1,7 +1,5 @@
 const express = require('express')
 const order = express()
-const multer = require('multer')
-const { upload } = require('../maddlewave')
 const { conn } = require("../database/connection")
 
 var cors = require('cors')
@@ -60,8 +58,6 @@ async function postOrderMember(req, res) {
 async function getOrderMember(req, res) {
   if (req.body) {
     const order = req.body;
-    console.log("================================")
-    console.log(order);
 
     const sql = `
     SELECT * FROM member_orders 
@@ -69,7 +65,7 @@ async function getOrderMember(req, res) {
     ON members.mem_id = member_orders.order_mem_id
     WHERE order_mem_id = ? and status = ?`;
 
-    await conn.execute(
+    const query = await conn.execute(
       sql,
       [order.mem_id, order.status],
       (err, result) => {
@@ -79,6 +75,7 @@ async function getOrderMember(req, res) {
             message: err.message,
             statusCode: 500,
           });
+          return
         }
         res.status(201).json({
           statusCode: 200,
