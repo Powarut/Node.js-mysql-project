@@ -1,6 +1,6 @@
 const express = require('express')
 const mysql2 = require('mysql2')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const {upload} = require('./maddlewave')
 
 const port = 3000
@@ -360,6 +360,45 @@ app.get('/food',cors(),async (req, res) => {
     })
   })
 })
+// read singed food
+app.get('/food/:food_id',cors(), async (req, res) => {
+  const { food_id } = req.params
+  console.log(req.params)
+  let sql = "SELETE * FROM food WHERE food_id = ?"
+  conn.execute(sql,
+    [food_id],
+    (err, result) => {
+      if(err){
+        res.status(500).json({
+          message : err.message
+        })
+        return
+      }
+      res.status(200).json({
+        message : "ดูข้อมูลสำเร็จ"
+    })
+  })
+})
+
+// read singed food
+app.get('/food/:food_id',cors(), async (req, res) => {
+  const { food_id } = req.params
+  console.log(req.params)
+  let sql = "SELETE * FROM food WHERE food_id = ?"
+  conn.execute(sql,
+    [food_id],
+    (err, result) => {
+      if(err){
+        res.status(500).json({
+          message : err.message
+        })
+        return
+      }
+      res.status(200).json({
+        message : "ดูข้อมูลสำเร็จ"
+    })
+  })
+})
 
 //delete food
 app.delete('/food/:food_id',cors(), async (req, res) => {
@@ -426,109 +465,7 @@ app.post('/foodtest',cors(), (req, res) => {
     }
   );
 })
-// end food API----------------------------------------------------------------
-
-//API add cart 
-app.post("/addMenutoCart", (req, res) => {
-  const {
-    mem_id,
-    food_id,
-    quantity
-  } = req.body
-  console.log(req.body)
-  const sql = "INSERT INTO cart(mem_id, food_id, quantity) VALUES(?, ?, ?)"
-  conn.execute( 
-    sql,
-    [
-      mem_id,
-      food_id,
-      quantity
-    ],
-    (err, result) => {
-      if (err) {
-        res.status(500).json({
-          message: err.message,
-        });
-        return;
-      }
-      res.status(201).json({
-        message: "เพิ่มเมนูลงตะกร้าแล้ว",
-        data: {
-          mem_id,
-          food_id,
-          quantity
-        }
-      });
-    }
-  )
-})
-//end
-
-// get menu in cart
-app.get("/menuInCart", (req, res) => {
-  const {
-    mem_id,
-    status
-  } = req.body
-  const sql = "SELECT * FROM cart WHERE mem_id = ? AND status = ?"
-  conn.execute(
-    sql,
-    [
-      mem_id,
-      status
-    ],
-    (err, result) => {
-      if (err) {
-        res.status(500).json({
-          message: err.message,
-        });
-        return;
-      }
-      res.status(201).json({
-        message: "เมนูในตะกร้า",
-        data: result,
-      });
-    }
-  )
-})//END
-
-// API edit quantity in cart
-app.put("/editcart", (req, res) => {
-    const {
-      quantity,
-      mem_id,
-      food_id,
-      cart_id,
-      status
-    } =  req.body
- 
-    if (status === 0) {
-      const sql = "UPDATE cart SET quantity = ? WHERE mem_id = ? AND food_id = ? AND cart_id AND status = ?"
-      conn.execute(
-        sql,
-        [
-          quantity,
-          mem_id,
-          food_id,
-          cart_id,
-          status
-        ],
-        (err, result) => {
-          if (err) {
-            res.status(500).json({
-              message: err.message,
-            });
-            return;
-          }
-          res.status(201).json({
-            message: "เปลี่ยนแปลงจำนวนแล้ว",
-            data: result,
-          });
-        }
-      )
-    }
-})
-//END
+// end API food --------
 
 
 app.post("/getOrderMember", async (req, res) => {
