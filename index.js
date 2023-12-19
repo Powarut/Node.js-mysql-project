@@ -319,7 +319,6 @@ app.put('/riders/:rider_id',cors(), async (req, res) => {
 
 // API  upload image+food
 app.post('/food',cors(),upload.single('food_image'), (req, res) => {
-  console.log(JSON.stringify(req.file.filename))
   const { food_name, food_price, food_status } = req.body
   const food_image = req.file.filename
   console.log(req.body)
