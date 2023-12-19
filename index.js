@@ -518,7 +518,7 @@ app.post("/saveOrderMember", (req, res) => {
               JSON.stringify(order),
               order.status
           ],
-          function (err, result, fields) {
+          (err, result) => {
               if(err) {
                 conn.rollback()
                 res.status(500).json({
