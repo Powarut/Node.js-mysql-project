@@ -188,39 +188,25 @@ await conn.execute(sql, [mem_email,], (err, result) => {
 })
 // end api login -----------------------------------------------------------------------------------------
 
-// API Login rider
-app.post('/login_rider',cors(),async (req, res) => {
-  console.log(61,req.body)
+// API Login owner,rider
+app.post('/login_rider',async (req, res) => {
+  try{
   const { rider_email, rider_password } = req.body
-    let sql = 'SELECT * FROM riders WHERE rider_email = ? ';
-await conn.execute(sql, [rider_email,], (err, result) => {
-    if(err) {
-      res.status(500).json({
-        message : err.message
-      })
-      return
-    }
-    console.log(141,result)
-    //ตรวจสอบค่าว่า result ต้องมี length
-    if(!result.length) {
-      res.status(500).json({
-        message : '',
-        status: 'fail'
-      })
-      return
-    }
-    console.log(rider_password)
-    const a = bcrypt.compare(rider_password,result[0].rider_password)
-    console.log(a)
-    if(bcrypt.compare(rider_password,result[0].rider_password)){
-      console.log(a , '-------------')
-      res.status(200).json({
-        message : "เรียกข้อมูลสำเร็จ",
-        data : result,
-        status : 'success'
-      })
-    }
-  })
+  const [result] = await conn.query('SELECT * FROM riders WHERE rider_email = ? ', rider_email)
+  const rider = result[0]
+  const match = bcrypt.compare(rider_password,rider.rider_password)
+  if(!match) {
+     res.status(400).json({ message: 'อีเมล์ หรือรหัสผ่านไม่ถูกต้อง' })
+     return false
+  }
+  // สร้างToken JWT 
+  res.json({ message: 'เข้าสู่ระบบสำเร็จ' })
+  } catch (error){
+    console.log('error',error)
+    res.status(401).json({
+      message: 'เข้าสู่ระบบล้มเหลว'
+    })
+  }
 })
 // end api login -----------------------------------------------------------------------------------------
 
@@ -341,7 +327,7 @@ app.post('/food',cors(),upload.single('food_image'), (req, res) => {
   );
 })
 
-// read food
+// read all food
 app.get('/food',cors(),async (req, res) => {
   let sql = "SELECT * FROM food"
   console.log('เรียกข้อมูลสำเร็จ')
@@ -356,25 +342,6 @@ app.get('/food',cors(),async (req, res) => {
     res.status(200).json({
       message : "เรียกข้อมูลสำเร็จ",
       data : result
-    })
-  })
-})
-// read singed food
-app.get('/food/:food_id',cors(), async (req, res) => {
-  const { food_id } = req.params
-  console.log(req.params)
-  let sql = "SELETE * FROM food WHERE food_id = ?"
-  conn.execute(sql,
-    [food_id],
-    (err, result) => {
-      if(err){
-        res.status(500).json({
-          message : err.message
-        })
-        return
-      }
-      res.status(200).json({
-        message : "ดูข้อมูลสำเร็จ"
     })
   })
 })
@@ -420,7 +387,7 @@ app.delete('/food/:food_id',cors(), async (req, res) => {
 })
 
 // API change ststus_food
-app.put('/food/food_id', async (req, res) => {
+app.put('/food/:food_id', async (req, res) => {
   console.log(req.body)
   const { food_id, status } = req.body
 
