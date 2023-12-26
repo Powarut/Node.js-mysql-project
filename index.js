@@ -418,26 +418,7 @@ app.put("/food/:food_id", async (req, res) => {
   });
 });
 
-//API creat food
-app.post("/foodtest", cors(), (req, res) => {
-  console.log(req.body);
-  const { food_name, food_price, food_status } = req.body;
 
-  let sql =
-    "INSERT INTO food (food_name, food_price, food_status) VALUES (?, ?, ?)";
-  conn.execute(sql, [food_name, food_price, food_status], (err, result) => {
-    if (err) {
-      res.status(500).json({
-        message: err.message,
-      });
-      return;
-    }
-    res.status(201).json({
-      message: "เพิ่มข้อมูลสำเร็จ",
-      data: result,
-    });
-  });
-});
 // end API food --------
 
 app.post("/getOrderMember", async (req, res) => {
@@ -500,6 +481,28 @@ app.post("/saveOrderMember", (req, res) => {
     );
   }
 });
+
+app.post("/selectOrder/:status", async (req, res)=>{
+  const status = req.params.status;
+  const sql = `SELECT * FROM orders WHERE status = ?`
+
+  await conn.execute(sql,[status],(err, result) =>{
+    if (err){
+      conn.rollback()
+      res.status(500).json({
+        message : err.message,
+        statusCode : 500
+      })
+      return
+    }
+    res.status(201).json({
+      message : "เพิ่มข้อมูลสำเร็จ",
+      data : result,
+      statusCode : 200
+    })
+  })
+});
+
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
