@@ -4,7 +4,7 @@ const conn = mysql2.createConnection({
     port : "3366",
     host: "console.aws.relist.dev",
     user: "mark",
-    password: "C-sZ0RMSY@q8RLQB",
+    password: "y",
     database: "mark_project"
   });
 

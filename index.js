@@ -211,69 +211,6 @@ app.post("/login_rider", cors(), async (req, res) => {
 });
 // end api login -----------------------------------------------------------------------------------------
 
-// API read all Rider
-app.get("/riders", cors(), async (req, res) => {
-  let sql = "SELECT * FROM riders";
-
-  await conn.execute(sql, (err, result) => {
-    if (err) {
-      res.status(500).json({
-        message: err.message,
-      });
-      return;
-    }
-    res.status(200).json({
-      message: "เรียกข้อมูลสำเร็จ",
-      data: result,
-    });
-  });
-});
-
-// API insert rider
-app.post("/riders", cors(), upload.single("rider_image"), async (req, res) => {
-  console.log(req.file);
-  const {
-    rider_email,
-    rider_password,
-    rider_name,
-    rider_surname,
-    rider_phone,
-    role,
-  } = req.body;
-  const rider_image = req.file.filename;
-
-  bcrypt.genSalt(saltRound, (err, salt) => {
-    bcrypt.hash(rider_password, salt, (err, hash) => {
-      let sql =
-        "INSERT INTO riders (rider_email, rider_password, rider_name, rider_surname, rider_phone, rider_image, role) VALUES (?, ?, ?, ?, ?, ?,?)";
-      conn.execute(
-        sql,
-        [
-          rider_email,
-          hash,
-          rider_name,
-          rider_surname,
-          rider_phone,
-          rider_image,
-          role,
-        ],
-        (err, result) => {
-          if (err) {
-            res.status(500).json({
-              message: err.message,
-            });
-            return;
-          }
-          res.status(201).json({
-            message: "เพิ่มข้อมูลสำเร็จ",
-            data: result,
-          });
-        }
-      );
-    });
-  });
-});
-
 //API read single rider
 app.get("/riders/:rider_id", cors(), async (req, res) => {
   const { rider_id } = req.params;
@@ -317,6 +254,85 @@ app.put("/riders/:rider_id", cors(), async (req, res) => {
   });
 });
 
+//Delete Rider
+app.delete("/riders/:rider_id", cors(), async (req, res) => {
+  const { rider_id } = req.params;
+  console.log(req.params);
+  let sql = "DELETE FROM riders WHERE rider_id = ?";
+  conn.execute(sql, [rider_id], (err, result) => {
+    if (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+      return;
+    }
+    res.status(200).json({
+      message: "ลบข้อมูลสำเร็จ",
+    });
+  });
+});
+
+// API read all Rider
+app.get("/riders", cors(), async (req, res) => {
+  let sql = "SELECT * FROM riders";
+
+  await conn.execute(sql, (err, result) => {
+    if (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+      return;
+    }
+    res.status(200).json({
+      message: "เรียกข้อมูลสำเร็จ",
+      data: result,
+    });
+  });
+});
+
+// API insert rider
+app.post("/riders", cors(), upload.single("rider_image"), async (req, res) => {
+  const {
+    rider_email,
+    rider_password,
+    rider_name,
+    rider_surname,
+    rider_phone,
+    role,
+  } = req.body;
+  const rider_image = req.file.filename;
+
+  bcrypt.genSalt(saltRound, (err, salt) => {
+    bcrypt.hash(rider_password, salt, (err, hash) => {
+      let sql =
+        "INSERT INTO riders (rider_email, rider_password, rider_name, rider_surname, rider_phone, rider_image, role) VALUES (?, ?, ?, ?, ?, ?,?)";
+      conn.execute(
+        sql,
+        [
+          rider_email,
+          hash,
+          rider_name,
+          rider_surname,
+          rider_phone,
+          rider_image,
+          role,
+        ],
+        (err, result) => {
+          if (err) {
+            res.status(500).json({
+              message: err.message,
+            });
+            return;
+          }
+          res.status(201).json({
+            message: "เพิ่มข้อมูลสำเร็จ",
+            data: result,
+          });
+        }
+      );
+    });
+  });
+});
 // END Riders -----------------------------------------------------------------------------------------------------
 
 // API  upload image+food
